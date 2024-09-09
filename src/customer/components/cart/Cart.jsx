@@ -1,7 +1,13 @@
 import React from 'react'
 import CartItem from './CartItem'
+import { useNavigate } from 'react-router-dom'
 
 const Cart = () => {
+
+  const navigate=useNavigate()
+  const handleCheckout=()=>{
+navigate("/checkout/?step=2")
+  }
   return (
     <div>
       <div className="sm:flex mt-20 items-center ">
@@ -31,7 +37,7 @@ const Cart = () => {
               <span className="text-green-600">₹1219</span>
             </div>
 
-            <button className="bg-indigo-500 w-full text-gray-300 text-2xl p-3  rounded-lg">
+            <button onClick={handleCheckout} className="bg-indigo-500 w-full text-gray-300 text-2xl p-3  rounded-lg">
               Checkout
             </button>
           </div>
