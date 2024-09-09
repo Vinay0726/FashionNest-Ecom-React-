@@ -1,8 +1,10 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
 const MainCard = ({ product }) => {
+  const navigate=useNavigate();
   return (
-    <div className="w-[18rem] ml-10  border border-gray-200 h-[300px]">
+    <div  className="w-[18rem] ml-10  border border-gray-200 h-[300px]">
       <div className="w-full h-[80%] ">
         <img
           src={product.imageUrl}

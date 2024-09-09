@@ -1,9 +1,10 @@
 
+import { useNavigate } from "react-router-dom";
 import { mens_tshirts } from "../../../Data/mens_tshirt";
 export default function Product() {
-
+const navigate=useNavigate();
   return (
-    <div className=" sm:-mt-6">
+    <div onClick={()=>navigate(`/product/${5}`)} className=" sm:-mt-6">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-4">
         <div className="-mt-6 sm:-mt-8 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
           {mens_tshirts.slice(0, 16).map((product) => (

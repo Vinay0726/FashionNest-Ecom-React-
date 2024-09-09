@@ -24,7 +24,7 @@ const DeliveryAddress = () => {
           xs={12}
           lg={5}
 
-          className="border rounded-e-md mt-10 shadow-md h-[30.5rem] overflow-y-scroll"
+          className="border rounded-e-md mt-10 ml-10 sm:ml-0 shadow-md h-[30.5rem] overflow-y-scroll"
         >
           <div className="p-5 py-7 border-b cursor-pointer">
             <AddressCard />

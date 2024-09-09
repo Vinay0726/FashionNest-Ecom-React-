@@ -13,8 +13,8 @@ const Order = () => {
   return (
     <div className="mt-40">
       <Grid container sx={{ justifyContent: "space-between" }}>
-        <Grid item xs={2.5}>
-          <div className="h-auto ml-10 shadow-lg bg-white p-5 sticky top-5">
+        <Grid item xs={12} md={2.5} lg={2.5}>
+          <div className="h-auto ml-1 lg:ml-10 shadow-lg bg-white p-5 sticky top-5">
             <h1 className="font-bold text-lg">Filter</h1>
 
             <div className="space-y-4 mt-10">
@@ -40,7 +40,7 @@ const Order = () => {
             </div>
           </div>
         </Grid>
-        <Grid item xs={9}>
+        <Grid item xs={12} md={9} lg={9}>
           {[1, 1, 1, 1, 1].map((item) => (
             <OrderCard />
           ))}

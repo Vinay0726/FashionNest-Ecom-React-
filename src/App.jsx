@@ -8,20 +8,26 @@ import { mens_tshirts } from "../../E-Commerce/src/Data/mens_tshirt";
 import { girls_tops } from "../../E-Commerce/src/Data/girls_tops";
 import RecentThreeCard from './customer/components/productscard/RecentThreeCard'
 import { Footer } from './customer/components/footer/Footer'
-import Product from './customer/components/product/product'
+// import Product from './customer/components/product/product'
 import ProductHero from './customer/components/product/ProductHero'
 import ProductDetails from './customer/ProductDetails/ProductDetails'
 import Cart from './customer/components/cart/Cart'
 import Checkout from './customer/components/checkout/Checkout'
 import Order from './customer/components/order/Order'
+import OrderDetails from './customer/components/order/OrderDetails'
+import CustomersRouters from './customer/components/routers/CustomersRouters'
+
 function App() {
  
 
   return (
     <div className="h-screen w-full">
-      <NavBar />
+   
+     <CustomersRouters/>
+
+      {/* <NavBar /> */}
       {/* <Crousel /> */}
-      <div className="w-full h-screen flex-col items-center justify-center">
+      {/* <div className="w-full h-screen flex-col items-center justify-center"> */}
         {/* <ProductCardCarousal
           data={mens_tshirts}
           sectionName={"Men's T-shirts"}
@@ -29,14 +35,15 @@ function App() {
 
         {/* <RecentThreeCard />
         <ProductCardCarousal data={girls_tops} sectionName={"Girl's Tops"} /> */}
-       {/* <ProductHero/> */}
-       {/* <ProductDetails/> */}
+        {/* <ProductHero/> */}
+        {/* <ProductDetails/> */}
 
-       {/* <Cart/> */}
-       {/* <Checkout/> */}
-       <Order/>
-        <Footer />
-      </div>
+        {/* <Cart/> */}
+        {/* <Checkout/> */}
+        {/* <Order/> */}
+        {/* <OrderDetails/> */}
+        {/* <Footer /> */}
+      {/* </div> */}
     </div>
   );
 }
