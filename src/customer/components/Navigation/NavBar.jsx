@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Fragment, useState } from "react";
 import {
@@ -18,17 +18,40 @@ import {
   ShoppingBagIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { navigation } from "./navigation";
-import Button from "@mui/material/Button";
+
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
+import AuthModel from "../../../Auth/AuthModel";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser, logout } from "../../../Store/Auth/Action";
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
+  const [openAuthModal, setOpenAuthModal] = useState(false);
+  const [anchorE1, setAnchorE1] = useState(null);
+
+  const openUserMenu = Boolean(anchorE1);
+  const jwt = localStorage.getItem("jwt");
+  const { auth } = useSelector((store) => store);
+  console.log(auth);
+  const dispatch = useDispatch();
+  const location = useLocation();
+
+  const handleUserClick = (event) => {
+    setAnchorE1(event.currentTarget);
+  };
+
+  const handleOpen = () => {
+    setOpenAuthModal(true);
+  };
+  const handleClose = () => {
+    setOpenAuthModal(false);
+  };
   const handleCategoryClick = (category, section, item, close) => {
     navigate(`/${category.id}/${section.id}/${item.id}`);
     setOpen(false);
@@ -37,9 +60,31 @@ export default function NavBar() {
   // Function to handle navigation and closing the popup
   const handleOrder = (close) => () => {
     navigate("/account/order");
-    close(); 
+    close();
     setOpen(false);
+  };
+  // Function to handle navigation and closing the popup
+  const handlePop= (close) => () => {
+    navigate("/");
+    close();
+    setOpen(false);
+  };
+  useEffect(() => {
+    if (jwt) {
+      dispatch(getUser(jwt));
+    }
+  }, [jwt, auth.jwt]);
+  useEffect(() => {
+    if (auth.user) handleClose();
+    if (["/login", "/register"].includes(location.pathname)) {
+      navigate(-1);
+    }
+  }, [auth.user]);
 
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.removeItem("jwt");
+    navigate("/");
   };
   return (
     <div className="bg-white fixed top-0 z-20 w-full">
@@ -161,20 +206,39 @@ export default function NavBar() {
             </div>
 
             <div className="space-y-6 border-t border-gray-200 px-4 py-6">
-              <div className="flow-root">
-                <a
-                  href="#"
-                  className="-m-2 block p-2 font-medium text-gray-900"
-                >
-                  Sign in
-                </a>
-              </div>
-              <div className="flow-root">
-                <ul>
-                  <li onClick={handleOrder(close)}>My Orders</li>
-                  <li className="mt-5">Logout</li>
-                </ul>
-              </div>
+              {auth.user?.firstName ? (
+                <div className="lg:ml-8 lg:flex">
+                  <div className="flex items-center space-x-4">
+                    <button className="bg-blue-300 text-white h-12 w-12 text-center font-semibold text-xl rounded-full">
+                      {auth.user?.firstName[0].toUpperCase()}
+                    </button>
+                    <ul className="space-y-2">
+                      <li
+                        className="cursor-pointer"
+                        onClick={() => console.log("Profile clicked")}
+                      >
+                        Profile
+                      </li>
+                      <li className="cursor-pointer" onClick={handleOrder}>
+                        My Orders
+                      </li>
+                      <li className="cursor-pointer" onClick={handleLogout}>
+                        Logout
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className="flow-root">
+                  <a
+                    onClick={handleOpen}
+                    href="#"
+                    className="-m-2 block p-2 font-medium text-gray-900"
+                  >
+                    Sign in
+                  </a>
+                </div>
+              )}
             </div>
           </DialogPanel>
         </div>
@@ -325,41 +389,54 @@ export default function NavBar() {
                   ))}
                 </div>
               </div>
-
               <div className="ml-auto flex items-center">
-                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  <a
-                    href="#"
-                    className="lg:text-xl lg:text-gray-500 text-sm font-medium text-gray-700 hover:text-gray-800"
-                  >
-                    Sign in
-                  </a>
-                </div>
-
-                <div className="hidden lg:ml-8 lg:flex">
-                  <PopupState variant="popover" popupId="demo-popup-menu">
-                    {(popupState) => (
-                      <React.Fragment>
-                        <button
-                          className="bg-blue-300 text-white  h-12 w-12 text-center font-semibold text-xl rounded-full"
-                          variant="contained"
-                          {...bindTrigger(popupState)}
-                        >
-                          V
-                        </button>
-                        <Menu {...bindMenu(popupState)}>
-                          <MenuItem onClick={popupState.close}>
-                            Profile
-                          </MenuItem>
-                          <MenuItem onClick={handleOrder(popupState.close)}>
-                            My Orders
-                          </MenuItem>
-                          <MenuItem onClick={popupState.close}>Logout</MenuItem>
-                        </Menu>
-                      </React.Fragment>
-                    )}
-                  </PopupState>
-                </div>
+                {auth.user?.firstName ? (
+                  <div className="hidden lg:ml-8 lg:flex">
+                    <PopupState variant="popover" popupId="demo-popup-menu">
+                      {(popupState) => (
+                        <React.Fragment>
+                          <button
+                            className="bg-blue-300 text-white  h-12 w-12 text-center font-semibold text-xl rounded-full"
+                            variant="contained"
+                            {...bindTrigger(popupState)}
+                          >
+                            {auth.user?.firstName[0].toUpperCase()}
+                          </button>
+                          <Menu {...bindMenu(popupState)}>
+                            <MenuItem onClick={popupState.close}>
+                              Profile
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                navigate("/account/order");
+                                popupState.close(); // Close the menu
+                              }}
+                            >
+                              My Orders
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                handleLogout(); // Call the logout function
+                                popupState.close(); // Close the popup state
+                              }}
+                            >
+                              Logout
+                            </MenuItem>
+                          </Menu>
+                        </React.Fragment>
+                      )}
+                    </PopupState>
+                  </div>
+                ) : (
+                  <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
+                    <a
+                      onClick={handleOpen}
+                      className="lg:text-xl lg:text-gray-500 text-sm font-medium text-gray-700 hover:text-gray-800"
+                    >
+                      Sign in
+                    </a>
+                  </div>
+                )}
 
                 {/* Search */}
                 <div className="flex lg:ml-6">
@@ -393,6 +470,7 @@ export default function NavBar() {
           </div>
         </nav>
       </header>
+      <AuthModel handleClose={handleClose} open={openAuthModal} />
     </div>
   );
 }

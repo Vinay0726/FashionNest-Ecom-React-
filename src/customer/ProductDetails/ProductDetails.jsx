@@ -1,6 +1,6 @@
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { Radio, RadioGroup } from "@headlessui/react";
 import { Grid, LinearProgress,Box, Rating } from "@mui/material";
@@ -11,7 +11,10 @@ import { mens_tshirts } from "../../Data/mens_tshirt";
 import MainCard from "../components/productscard/MainCard";
 import RecentThreeCard from "../components/productscard/RecentThreeCard";
 import Product from "../components/product/product";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { findProductsById } from "../../Store/Product/Action";
+import { addItemToCart } from "../../Store/Cart/Action";
 
 const product = {
   name: "Basic Tee 6-Pack",
@@ -74,47 +77,75 @@ export default function ProductDetails() {
   const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
 
   const navigate=useNavigate();
-  const handleAddToCart=()=>{
-navigate("/cart")
+  const params=useParams();
+  const dispatch=useDispatch();
+
+  const {productData}=useSelector(store=>store)
+
+ 
+
+
+
+
+  const handleAddToCart=(e)=>{
+    e.preventDefault(); 
+   const data = {
+     productId: params.productId,
+     size: selectedSize.name,
+   };
+   console.log("select size", data);
+
+   dispatch(addItemToCart(data))
+    //  .then(() => navigate("/cart"))
+    //  .catch((error) =>
+    //    console.error("Failed to add item to cart:", error.message)
+    //  );
   }
+  useEffect(()=>{
+  const data={
+productId:params.productId
+  }
+ 
+dispatch(findProductsById(data))
+
+  },[params.productId])
 
   return (
     <div className="bg-white mt-28">
-      <div className="pt-6">
+      <div className="pt-10">
         <nav aria-label="Breadcrumb">
           <ol
             role="list"
             className="mx-auto ml-10 flex  max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:ml-72"
           >
-            {product.breadcrumbs.map((breadcrumb) => (
-              <li key={breadcrumb.id}>
-                <div className="flex items-center">
-                  <a
-                    href={breadcrumb.href}
-                    className="mr-2 text-sm font-medium text-gray-900"
-                  >
-                    {breadcrumb.name}
-                  </a>
-                  <svg
-                    fill="currentColor"
-                    width={16}
-                    height={20}
-                    viewBox="0 0 16 20"
-                    aria-hidden="true"
-                    className="h-5 w-4 text-gray-300"
-                  >
-                    <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
-                  </svg>
-                </div>
-              </li>
-            ))}
-            <li className="text-sm">
+            <li className="text-base font-bold">
               <a
-                href={product.href}
+                aria-current="page"
+                className="font-bold text-gray-500 hover:text-gray-600"
+              >
+                {
+                  productData.product?.category?.parentCategory?.parentCategory
+                    ?.name
+                }
+                <span> /</span>
+              </a>
+            </li>
+            <li className="text-base ">
+              <a
                 aria-current="page"
                 className="font-medium text-gray-500 hover:text-gray-600"
               >
-                {product.name}
+                {productData.product?.category?.parentCategory?.name}
+                <span> /</span>
+              </a>
+            </li>
+
+            <li className="text-base ">
+              <a
+                aria-current="page"
+                className="font-medium text-gray-500 hover:text-gray-600"
+              >
+                {productData.product?.title}
               </a>
             </li>
           </ol>
@@ -125,8 +156,7 @@ navigate("/cart")
           <div className="flex flex-col items-center ">
             <div className="overflow-hidden rounded-lg max-w-[30rem] max-h-[35rem]">
               <img
-                alt={product.images[0].alt}
-                src={product.images[0].src}
+                src={productData.product?.imageUrl}
                 className="h-full w-full object-cover object-center"
               />
             </div>
@@ -148,9 +178,11 @@ navigate("/cart")
           <div className="mx-auto max-w-2xl px-6 pb-16 pt-10 sm:px-6 lg:max-w-3xl lg:-ml-16 ">
             <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
               <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
-                {product.name}
+                {productData.product?.title}
               </h1>
-              <p className="text-xl lg:text-2xl text-gray-500 mt-2">heiwlad</p>
+              <p className="text-xl lg:text-2xl text-gray-500 mt-2">
+                {productData.product?.brand}
+              </p>
             </div>
 
             {/* Options */}
@@ -161,14 +193,14 @@ navigate("/cart")
                   MRF{" "}
                   <span className="text-gray-900 text-3xl">
                     {" "}
-                    {product.price}
+                    ₹ {productData.product?.discountedPrice}
                   </span>
                 </p>
                 <p className="text-2xl tracking-tight line-through ml-3 text-gray-400">
-                  Rs211
+                  Rs{productData.product?.price}
                 </p>
                 <p className="text-3xl tracking-tight ml-3 font-bold text-green-400">
-                  5%Off
+                  {productData.product?.discountPercent}%Off
                 </p>
               </div>
 
@@ -177,13 +209,15 @@ navigate("/cart")
                 <div className="flex items-center space-x-5">
                   <Rating
                     name="half-rating"
-                    defaultValue={4.5}
+                    defaultValue={productData.product?.ratings}
                     precision={0.5}
                     readOnly
                   />
-                  <p className="opacity-50 text-sm">56374 Ratings</p>
+                  <p className="opacity-50 text-sm">
+                    {productData.product?.ratings} Ratings
+                  </p>
                   <p className="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                    3870 Reviews
+                    {productData.product?.reviews} Reviews
                   </p>
                 </div>
               </div>
@@ -278,7 +312,8 @@ navigate("/cart")
                   </fieldset>
                 </div>
 
-                <button onClick={handleAddToCart}
+                <button
+                  onClick={handleAddToCart}
                   type="submit"
                   className="mt-10 flex w-[45%] sm:w-[35%] lg:w-[25%] items-center gap-2 justify-center rounded-xl border border-transparent bg-indigo-500 px-8 py-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
@@ -294,7 +329,7 @@ navigate("/cart")
 
                 <div className="space-y-6">
                   <p className="text-base text-gray-900">
-                    {product.description}
+                    {productData.product?.description}
                   </p>
                 </div>
               </div>
@@ -319,7 +354,9 @@ navigate("/cart")
                 <h2 className="text-sm font-medium text-gray-900">Details</h2>
 
                 <div className="mt-4 space-y-6">
-                  <p className="text-sm text-gray-600">{product.details}</p>
+                  <p className="text-sm text-gray-600">
+                    {productData.product?.description}
+                  </p>
                 </div>
               </div>
             </div>

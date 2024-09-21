@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Transition } from "@headlessui/react";
 import {
   Dialog,
@@ -24,10 +24,19 @@ import {
   MdAdd,
   MdRemove,
 } from "react-icons/md";
+import React from "react";
+import Pagination from "@mui/material/Pagination";
+import Product from "../product/product";
+import { IoFilter, IoFilterSharp } from "react-icons/io5";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { findProducts } from "../../../Store/Product/Action";
+import { useSelector } from "react-redux";
+
 
 const sortOptions = [
-  { name: "Price: Low to High", href: "#", current: false },
-  { name: "Price: High to Low", href: "#", current: false },
+  { name: "Price: Low to High", value: "price_low", current: false },
+  { name: "Price: High to Low", value: "price_high", current: false },
 ];
 
 // Updated filters with only "Color," "Size," "Price Range," "Discount Range," and "Availability"
@@ -97,54 +106,123 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-import React from "react";
-import Product from "../product/product";
-import { IoFilter, IoFilterSharp } from "react-icons/io5";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+
 
 const FilterData = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const location =useLocation()
-  const navigate=useNavigate()
-  const handleFilter =(value,sectionId)=>{
+  const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
+  //getting product data from store
+  const { productData } = useSelector(store=>store);
+
+
+  const { levelOne, levelTwo, levelThree } = useParams();
+
+  // 'levelThree' will give you 'mens_kurta' in this case
+  const category = levelThree;
+
+  // for api filter
+  const decodeQueryString = decodeURI(location.search);
+  const searchParams = new URLSearchParams(decodeQueryString);
+  const colorValue = searchParams.get("color");
+  const sizeValue = searchParams.get("size");
+  const priceValue = searchParams.get("price");
+  const discount = searchParams.get("discount");
+  const sortValue = searchParams.get("sort");
+  const pageNumber = searchParams.get("page") || 1;
+  const stock = searchParams.get("stock");
+
+ const handlePaginationChange = (event, value) => {
    const searchParams = new URLSearchParams(location.search);
-   let filterValue = searchParams.getAll(sectionId);
+   searchParams.set("page", value); // Set the page as the second argument (value)
 
-   // If the section already has values, split them into an array
-   if (filterValue.length > 0) {
-     filterValue = filterValue[0].split(",");
-   } else {
-     filterValue = [];
-   }
-
-   // Check if the value is already present
-   if (filterValue.includes(value)) {
-     // Remove the value if it's already present
-     filterValue = filterValue.filter((item) => item !== value);
-   } else {
-     // Add the value if it's not present
-     filterValue.push(value);
-   }
-
-   // Update the search parameters
-   if (filterValue.length === 0) {
-     searchParams.delete(sectionId);
-   } else {
-     searchParams.set(sectionId, filterValue.join(","));
-   }
-
-   // Navigate with the updated query string
    const query = searchParams.toString();
-   navigate({ search: `?${query}` });
-  }
+   navigate({ search: `${query}` });
+ };
 
-  const handleRadioFilter=(e,sectionId)=>{
-    const searchParams=new URLSearchParams(location.search)
-    searchParams.set(sectionId,e.target.value)
-     const query = searchParams.toString();
-     navigate({ search: `?${query}` });
+ const handleSort=(event,sortValue)=>{
+  const searchParams = new URLSearchParams(location.search);
+  searchParams.set("sort", sortValue);
+  const query = searchParams.toString();
+  navigate({ search: `${query}`})
 
-  }
+ }
+
+  const handleFilter = (value, sectionId) => {
+    const searchParams = new URLSearchParams(location.search);
+    let filterValue = searchParams.getAll(sectionId);
+
+    // If the section already has values, split them into an array
+    if (filterValue.length > 0) {
+      filterValue = filterValue[0].split(",");
+    } else {
+      filterValue = [];
+    }
+
+    // Check if the value is already present
+    if (filterValue.includes(value)) {
+      // Remove the value if it's already present
+      filterValue = filterValue.filter((item) => item !== value);
+    } else {
+      // Add the value if it's not present
+      filterValue.push(value);
+    }
+
+    // Update the search parameters
+    if (filterValue.length === 0) {
+      searchParams.delete(sectionId);
+    } else {
+      searchParams.set(sectionId, filterValue.join(","));
+    }
+
+    // Navigate with the updated query string
+    const query = searchParams.toString();
+    navigate({ search: `?${query}` });
+  };
+
+  const handleRadioFilter = (e, sectionId) => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set(sectionId, e.target.value);
+    const query = searchParams.toString();
+    navigate({ search: `?${query}` });
+  };
+
+  //for api
+  useEffect(() => {
+    const [minPrice, maxPrice] =
+      priceValue === null ? [0, 1000] : priceValue.split("-").map(Number);
+
+    const data = {
+      category: category,
+      colors: colorValue ? colorValue.split(",") : [],
+      sizes: sizeValue ? sizeValue.split(",") : [],
+      minPrice,
+      maxPrice,
+      minDiscount: discount || 0,
+      sort: sortValue || "price_low",
+      pageNumber: pageNumber - 1,
+      pageSize: 10,
+      stock: stock !== "null" ? stock : undefined, // Adjusting for null handling
+    };
+
+    // Console log the data object being passed to the API
+    console.log("Data being sent to API:", data);
+    dispatch(findProducts(data));
+  }, [
+    dispatch,
+    category,
+    colorValue,
+    sizeValue,
+    priceValue,
+    discount,
+    sortValue,
+    pageNumber,
+    stock,
+  ]);
+  
   return (
     <div className="bg-white w-full">
       <div>
@@ -206,7 +284,9 @@ const FilterData = () => {
                         {section.options.map((option, optionIdx) => (
                           <div key={option.value} className="flex items-center">
                             <input
-                            onChange={()=>handleFilter(option.value,section.id)}
+                              onChange={() =>
+                                handleFilter(option.value, section.id)
+                              }
                               defaultValue={option.value}
                               defaultChecked={option.checked}
                               id={`filter-mobile-${section.id}-${optionIdx}`}
@@ -311,7 +391,8 @@ const FilterData = () => {
                     {sortOptions.map((option) => (
                       <MenuItem key={option.name}>
                         <a
-                          href={option.href}
+                          // href={option.href}
+                          onClick={(event) => handleSort(event, option.value)}
                           className={classNames(
                             option.current
                               ? "font-medium text-gray-900"
@@ -385,7 +466,9 @@ const FilterData = () => {
                         {section.options.map((option, optionIdx) => (
                           <div key={option.value} className="flex items-center">
                             <input
-                              onChange={()=>handleFilter(option.value,section.id)}
+                              onChange={() =>
+                                handleFilter(option.value, section.id)
+                              }
                               id={`filter-${section.id}-${optionIdx}`}
                               name={`${section.id}[]`}
                               defaultValue={option.value}
@@ -433,7 +516,7 @@ const FilterData = () => {
                         {section.options.map((option, optionIdx) => (
                           <div key={option.value} className="flex items-center">
                             <input
-                            onChange={(e)=>handleRadioFilter(e,section.id)}
+                              onChange={(e) => handleRadioFilter(e, section.id)}
                               id={`filter-${section.id}-${optionIdx}`}
                               name={section.id} // All radio buttons in a section share the same name
                               defaultValue={option.value}
@@ -456,9 +539,32 @@ const FilterData = () => {
               </form>
 
               {/* Product grid */}
-              <div className="lg:col-span-3">
-                <Product />
+              <div className="lg:col-span-3 border">
+                <div className="sm:-mt-6">
+                  <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-4">
+                    <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+                      {productData.products &&
+                      productData.products.content?.length > 0 ? (
+                        productData.products.content.map((item) => (
+                          <Product key={item.id} product={item} />
+                        ))
+                      ) : (
+                        <p>No products found.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
+          </section>
+          <section className="w-full ">
+            <div className="px-4 py-1 flex justify-center">
+              <Pagination
+                count={productData.products?.totalPages}
+                onChange={handlePaginationChange}
+                variant="outlined"
+                shape="rounded"
+              />
             </div>
           </section>
         </main>

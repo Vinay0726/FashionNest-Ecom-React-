@@ -11,6 +11,7 @@ import ProductHero from "../product/ProductHero";
 import Checkout from "../checkout/Checkout";
 import Order from "../order/Order";
 import OrderDetails from "../order/OrderDetails";
+import HomePage from "../homepage/HomePage";
 
 const CustomersRouters = () => {
   return (
@@ -19,7 +20,9 @@ const CustomersRouters = () => {
         <NavBar />
       </div>
       <Routes>
-        <Route path="/" element={<Crousel />} />
+        <Route path="/login" element={<HomePage />} />
+        <Route path="/register" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
 
         <Route path="/cart" element={<Cart />} />
         <Route
