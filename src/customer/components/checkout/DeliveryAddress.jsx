@@ -1,20 +1,27 @@
 import React from "react";
 import AddressCard from "../address/AddressCard";
 import { Box, Button, Grid, TextField } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { createOrder } from "../../../Store/Order/Action";
+import { useNavigate } from "react-router-dom";
 
 const DeliveryAddress = () => {
+  const dispatch=useDispatch()
+  const navigate=useNavigate()
     const handleSubmit=(e)=>{
         e.preventDefault()
         const data=new FormData(e.currentTarget)
         const address = {
           firstName: data.get("firstName"),
           lastName: data.get("lastName"),
-          lastName: data.get("lastName"),
           streetAddress: data.get("address"),
           city: data.get("city"),
-          state: data.get("zip"),
+          state: data.get("state"),
+          zipCode: data.get("zip"),
           mobile: data.get("phoneNumber"),
         };
+        const orderData={address,navigate}
+        dispatch(createOrder(orderData))
         console.log("address", address);
     }
   return (
@@ -26,7 +33,7 @@ const DeliveryAddress = () => {
 
           className="border rounded-e-md mt-10 ml-10 sm:ml-0 shadow-md h-[30.5rem] overflow-y-scroll"
         >
-          <div className="p-5 py-7 border-b cursor-pointer">
+          {/* <div className="p-5 py-7 border-b cursor-pointer">
             <AddressCard />
             <Button
               sx={{ mt: 2, bgcolor: "RGB(145 85 253)" }}
@@ -35,7 +42,7 @@ const DeliveryAddress = () => {
             >
               Deliver Here
             </Button>
-          </div>
+          </div> */}
         </Grid>
 
         <Grid item xs={12} lg={7}>

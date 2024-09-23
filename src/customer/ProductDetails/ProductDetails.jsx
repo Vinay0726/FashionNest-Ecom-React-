@@ -96,10 +96,10 @@ export default function ProductDetails() {
    console.log("select size", data);
 
    dispatch(addItemToCart(data))
-    //  .then(() => navigate("/cart"))
-    //  .catch((error) =>
-    //    console.error("Failed to add item to cart:", error.message)
-    //  );
+     .then(() => navigate("/cart"))
+     .catch((error) =>
+       console.error("Failed to add item to cart:", error.message)
+     );
   }
   useEffect(()=>{
   const data={

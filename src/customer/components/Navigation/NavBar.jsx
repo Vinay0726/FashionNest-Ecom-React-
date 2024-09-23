@@ -27,6 +27,7 @@ import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 import AuthModel from "../../../Auth/AuthModel";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, logout } from "../../../Store/Auth/Action";
+import { getCart } from "../../../Store/Cart/Action";
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
@@ -38,6 +39,7 @@ export default function NavBar() {
   const openUserMenu = Boolean(anchorE1);
   const jwt = localStorage.getItem("jwt");
   const { auth } = useSelector((store) => store);
+  const { cart } = useSelector((store) => store);
   console.log(auth);
   const dispatch = useDispatch();
   const location = useLocation();
@@ -69,6 +71,9 @@ export default function NavBar() {
     close();
     setOpen(false);
   };
+    useEffect(() => {
+      dispatch(getCart());
+    }, [dispatch]);
   useEffect(() => {
     if (jwt) {
       dispatch(getUser(jwt));
@@ -460,7 +465,7 @@ export default function NavBar() {
                       className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                     />
                     <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                      0
+                     {cart.cart?.cartItems.length}
                     </span>
                     <span className="sr-only">items in cart, view bag</span>
                   </a>
