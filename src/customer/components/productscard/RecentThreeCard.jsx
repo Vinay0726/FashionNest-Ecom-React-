@@ -1,28 +1,34 @@
-import React from 'react'
-import { mens_tshirts } from "../../../Data/mens_tshirt";
-const RecentThreeCard = () => {
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-    
+const RecentThreeCard = ({ products }) => {
+  console.log("products in RecentThreeCard", products);
+  const navigate=useNavigate()
+
   return (
-    <div className="mt-5 mb-5 p-16 sm:pb-60 sm:ml-5 lg:pb-24  border border-gray-300">
-      <h1 className="p-5 text-2xl text-center">Latest Products</h1>
-      <div className="flex-col  justify-center items-center  sm:gap-2 sm:flex sm:ml-0 sm:-m-5 sm:flex-row">
-        {mens_tshirts.slice(0, 3).map((item, index) => (
+    <div className="sm:w-[96%] ml-10 mb-5 p-5 border border-gray-300">
+      <h1 className=" text-2xl p-5 text-center">Latest Products</h1>
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-10 p-10 ">
+        {products.map((item, index) => (
           <div
             key={index}
-            className="relative mt-10 ml-5 sm:ml-0   bg-slate-100 border border-gray-300"
+            onClick={() => navigate(`/product/${item.id}`)}
+            className="flex h-full border relative"
           >
-            <div className="sm:w-[50%]">
-              <img src={item.imageUrl} alt="" />
+            <div className="h-full">
+              <img
+                className="h-[350px] w-[300px] "
+                src={item.imageUrl}
+                alt={item.title}
+              />
             </div>
-
-            <div className="sm:h-[70%] flex-col bg-white/40 justify-center items-center  absolute   rounded-md p-4 top-52 sm:bg-white/85 sm:top-40 sm:right-0 right-10 z-[1]">
+            <div className="absolute p-5 bg-slate-50/90 bottom-0 w-full">
               <h1 className="pt-5 text-2xl text-gray-400 uppercase font-semibold">
                 {item.brand}
               </h1>
-              <p className="pt-5 text-xl text-gray-500 ">{item.title}</p>
-              <h3 className="pt-5 text-5xl text-green-800 font-bold">
-                {item.discountPersent}%
+              <p className="pt-5 text-xl text-gray-500">{item.title}</p>
+              <h3 className="pt-5 text-3xl text-green-600 font-bold">
+                {item.discountPercent}%
               </h3>
             </div>
           </div>
@@ -30,6 +36,6 @@ const RecentThreeCard = () => {
       </div>
     </div>
   );
-}
+};
 
-export default RecentThreeCard
+export default RecentThreeCard;

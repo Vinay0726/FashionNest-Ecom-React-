@@ -16,33 +16,37 @@ import Checkout from './customer/components/checkout/Checkout'
 import Order from './customer/components/order/Order'
 import OrderDetails from './customer/components/order/OrderDetails'
 import CustomersRouters from './customer/components/routers/CustomersRouters'
+import { Route, Routes } from 'react-router-dom'
+import AdminRouters from './customer/components/routers/AdminRouters'
 
 function App() {
  
 
   return (
     <div className="h-screen w-full">
-   
-     <CustomersRouters/>
+      <Routes>
+        <Route path="/*" element={<CustomersRouters />}></Route>
+        <Route path="/admin/*" element={<AdminRouters />}></Route>
+      </Routes>
 
       {/* <NavBar /> */}
       {/* <Crousel /> */}
       {/* <div className="w-full h-screen flex-col items-center justify-center"> */}
-        {/* <ProductCardCarousal
+      {/* <ProductCardCarousal
           data={mens_tshirts}
           sectionName={"Men's T-shirts"}
         /> */}
 
-        {/* <RecentThreeCard />
+      {/* <RecentThreeCard />
         <ProductCardCarousal data={girls_tops} sectionName={"Girl's Tops"} /> */}
-        {/* <ProductHero/> */}
-        {/* <ProductDetails/> */}
+      {/* <ProductHero/> */}
+      {/* <ProductDetails/> */}
 
-        {/* <Cart/> */}
-        {/* <Checkout/> */}
-        {/* <Order/> */}
-        {/* <OrderDetails/> */}
-        {/* <Footer /> */}
+      {/* <Cart/> */}
+      {/* <Checkout/> */}
+      {/* <Order/> */}
+      {/* <OrderDetails/> */}
+      {/* <Footer /> */}
       {/* </div> */}
     </div>
   );

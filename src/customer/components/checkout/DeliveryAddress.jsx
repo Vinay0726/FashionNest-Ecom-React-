@@ -1,13 +1,54 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AddressCard from "../address/AddressCard";
 import { Box, Button, Grid, TextField } from "@mui/material";
-import { useDispatch } from "react-redux";
-import { createOrder } from "../../../Store/Order/Action";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { createOrder, getOrderById } from "../../../Store/Order/Action";
+import { useNavigate, useLocation } from "react-router-dom";
+import { getUser } from "../../../Store/Auth/Action";
+import { getCart } from "../../../Store/Cart/Action";
 
 const DeliveryAddress = () => {
   const dispatch=useDispatch()
   const navigate=useNavigate()
+
+  //for address cart
+     const location = useLocation();
+     const { order } = useSelector((store) => store);
+     const { cart } = useSelector((store) => store);
+    //  const searchPrams = new URLSearchParams(location.search);
+    //  const orderId = searchPrams.get("order_id");
+
+     useEffect(()=>{
+      dispatch(getCart);
+     },[])
+          const orderId = cart.cart?.user?.address[0]?.id; 
+          const addres = cart.cart?.user?.address[0]; 
+      useEffect(() => {
+
+        if (orderId) {    
+          dispatch(getOrderById(orderId));
+
+          
+        }
+      }, [dispatch, orderId]);
+
+      console.log("order id babaja",orderId)
+     
+ const handleDeliveredhere=(()=>{
+   const address = {
+     firstName: addres?.firstName,
+     lastName: addres?.lastName,
+     streetAddress: addres?.streetAddress,
+     city: addres?.city,
+     state: addres?.state,
+     zipCode: addres?.zipCode,
+     mobile: addres?.mobile,
+   };
+   const orderData = { address, navigate };
+   dispatch(createOrder(orderData));
+   console.log("address", address);
+ })
+//end address cart
     const handleSubmit=(e)=>{
         e.preventDefault()
         const data=new FormData(e.currentTarget)
@@ -24,25 +65,27 @@ const DeliveryAddress = () => {
         dispatch(createOrder(orderData))
         console.log("address", address);
     }
+    
+     
   return (
     <div className="mt-16">
       <Grid container spacing={4}>
         <Grid
           xs={12}
           lg={5}
-
           className="border rounded-e-md mt-10 ml-10 sm:ml-0 shadow-md h-[30.5rem] overflow-y-scroll"
         >
-          {/* <div className="p-5 py-7 border-b cursor-pointer">
-            <AddressCard />
+          <div className="p-5 py-7 border-b cursor-pointer">
+            <AddressCard address={order.order?.shippingAddress} />
             <Button
+              onClick={handleDeliveredhere}
               sx={{ mt: 2, bgcolor: "RGB(145 85 253)" }}
               size="large"
               variant="contained"
             >
               Deliver Here
             </Button>
-          </div> */}
+          </div>
         </Grid>
 
         <Grid item xs={12} lg={7}>
@@ -123,7 +166,7 @@ const DeliveryAddress = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Button
-                    sx={{py:2, mt: 2, bgcolor: "RGB(145 85 253)" }}
+                    sx={{ py: 2, mt: 2, bgcolor: "RGB(145 85 253)" }}
                     size="large"
                     variant="contained"
                     type="submit"

@@ -31,11 +31,10 @@ const ProductCardCarousel = ({data,sectionName}) => {
     setCurrentIndex(event.item);
   };
 
-  const items = data
-    .map((item) => <MainCard key={item.id} product={item} />);
+  const items = data.map((item) => <MainCard key={item.id} product={item} />);
 
   return (
-    <div className="w-[96%] h-[50%] ml-10 border overflow-hidden border-gray-200">
+    <div className="w-[96%] h-[50%] mb-12 ml-10 border overflow-hidden border-gray-200">
       <h1 className="text-center text-xl p-5">{sectionName}</h1>
 
       <div className="flex h-[80%] relative w-full overflow-hidden">

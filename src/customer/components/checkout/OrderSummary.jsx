@@ -11,7 +11,7 @@ const OrderSummary = () => {
    const {order}=useSelector(store=>store)
    const searchPrams=new URLSearchParams(location.search)
    const orderId = searchPrams.get("order_id")
-   console.log("orderjsjsjjsj",orderId)
+  
 
   useEffect(() => {
     if (orderId) {

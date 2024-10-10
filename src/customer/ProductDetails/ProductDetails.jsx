@@ -166,7 +166,7 @@ dispatch(findProductsById(data))
                 <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg max-w-[6rem] max-h-[6rem] mt-4">
                   <img
                     alt={item.alt}
-                    src={item.src}
+                    src={productData.product?.imageUrl}
                     className="h-full w-full object-cover object-center"
                   />
                 </div>

@@ -4,6 +4,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { removeCartItem, updateCartItem } from "../../../Store/Cart/Action";
+import { VscNoNewline } from "react-icons/vsc";
 
 const CartItem = ({ item }) => {
   const dispatch = useDispatch();
